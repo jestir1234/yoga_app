@@ -1,0 +1,59 @@
+{% block content %}
+<h1>Workshop List</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Title</th>
+      <th>Date</th>
+      <th>Price</th>
+      <th>Teacher</th>
+      <th>Location</th>
+      <th>Description</th>
+      <th>Photo</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for workshop in workshops %}
+    <tr>
+      <td>{{ workshop.title }}</td>
+      <td>{{ workshop.date }}</td>
+      <td>{{ workshop.price }}</td>
+      <td>{{ workshop.teacher }}</td>
+      <td>{{ workshop.location }}</td>
+      <td>{{ workshop.description }}</td>
+      <td><img src="{{ workshop.photo.url }}" alt="{{ workshop.title }}" style="max-width: 100px;"></td>
+      <td>
+        <form method="POST" action="{% url 'workshop_delete' workshop.id %}">
+          {% csrf_token %}
+          <button type="submit">Delete</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 8px;
+    border-right: 1px solid #ddd;
+  }
+
+  th:last-child,
+  td:last-child {
+    border-right: none;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+</style>

@@ -1,0 +1,44 @@
+<form id="user-form" method="post" action="{% url 'user_create' %}">
+  {% csrf_token %}
+  <label for="first_name">First Name:</label>
+  <input type="text" id="first_name" name="first_name" required>
+  <br>
+  <label for="last_name">Last Name:</label>
+  <input type="text" id="last_name" name="last_name" required>
+  <br>
+  <label for="email">Email:</label>
+  <input type="email" id="email" name="email" required>
+  <br>
+  <label for="password">Password:</label>
+  <input type="password" id="password" name="password" required>
+  <br>
+  <label for="type">Type:</label>
+  <select name="type" id="type">
+    <option value="normal">Normal</option>
+    <option value="teacher">Teacher</option>
+  </select>
+  <br>
+  <div id="studio_fields" style="display:none;">
+    <label for="studio_name">Studio Name:</label>
+    <input type="text" id="studio_name" name="studio_name">
+    <br>
+    <label for="studio_location">Studio Location:</label>
+    <input type="text" id="studio_location" name="studio_location">
+    <br>
+  </div>
+  <button type="submit">Create User</button>
+</form>
+
+<script>
+  var typeSelect = document.getElementById("type");
+  var studioFields = document.getElementById("studio_fields");
+  var form = document.getElementById("user-form");
+
+  typeSelect.addEventListener("change", function () {
+    if (typeSelect.value === "teacher") {
+      studioFields.style.display = "block";
+    } else {
+      studioFields.style.display = "none";
+    }
+  });
+</script>

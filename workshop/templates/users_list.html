@@ -1,0 +1,51 @@
+{% block content %}
+<h1>User List</h1>
+<table>
+  <thead>
+    <tr>
+      <th>Email</th>
+      <th>Type</th>
+      <th>Studio Name</th>
+      <th>Studio Location</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for user in users %}
+    <tr>
+      <td>{{ user.email }}</td>
+      <td>{{ user.type }}</td>
+      {% if user.type == 'teacher' %}
+      <td>{{ user.studio_name }}</td>
+      <td>{{ user.studio_location }}</td>
+      {% else %}
+      <td></td>
+      <td></td>
+      {% endif %}
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
+
+<style>
+  table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  th,
+  td {
+    text-align: left;
+    padding: 8px;
+    border-right: 1px solid #ddd;
+  }
+
+  th:last-child,
+  td:last-child {
+    border-right: none;
+  }
+
+  tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+</style>
