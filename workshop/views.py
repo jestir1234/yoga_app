@@ -1,18 +1,16 @@
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from rest_framework.response import Response
 from rest_framework import generics, status
-from rest_framework.views import APIView
 from django.views import View
 from django.http import JsonResponse, HttpResponse
-from django.urls import reverse_lazy
-from .models.users import User
-from .models import Workshop
+from .models import Workshop, Booking, User
+from django.contrib import messages
 
 from .serializers import UserSerializer
-from .forms import WorkshopForm
+from .forms import WorkshopForm, PersonalInfoForm
 
 def login_view(request):
     if request.method == 'POST':
@@ -146,7 +144,6 @@ def workshop_list_view(request):
 
 
 def workshop_delete(request, workshop_id):
-    print('request', request)
     if request.method == 'POST':
         try:
             workshop = Workshop.objects.get(id=workshop_id)
@@ -154,6 +151,87 @@ def workshop_delete(request, workshop_id):
             return redirect('workshops_list')
         except Workshop.DoesNotExist:
             return HttpResponse(status=404)
+
+
+@login_required
+def book_workshops(request):
+    workshops = Workshop.objects.all()
+    booked_workshops = Booking.objects.filter(
+        user=request.user).values_list('workshop_id', flat=True)
+    bookings = [
+        workshop for workshop in workshops if workshop.id in booked_workshops]
+    context = {'workshops': workshops, 'bookings': bookings}
+    return render(request, 'workshop_booking.html', context)
+
+
+@login_required
+def book_workshop(request, workshop_id):
+    workshop = get_object_or_404(Workshop, id=workshop_id)
+    if request.method == 'POST':
+        if workshop != None:
+            # Create a new booking object and save it
+            booking = Booking.objects.create(
+                user=request.user,
+                workshop=workshop,
+            )
+            booking.user = request.user
+            booking.workshop = workshop
+            booking.save()
+            return redirect('book_workshops')
+        else:
+            print('WORKSHOP NOT FOUND')
+            return HttpResponse(status=404)
+        
+
+@login_required
+def cancel_booking(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id, user=request.user)
+    workshop = booking.workshop
+    booking.delete()
+    return redirect('book_workshops')
+
+
+@login_required
+def list_bookings(request):
+    bookings = Booking.objects.all()
+    return render(request, 'bookings_list.html', {'bookings': bookings})
+
+
+@login_required
+@user_passes_test(lambda user: user.type == 'teacher', login_url='home')
+def my_workshops(request):
+    workshops = Workshop.objects.filter(teacher=request.user)
+    return render(request, 'my_workshops.html', {'workshops': workshops})
+
+
+@login_required
+@user_passes_test(lambda user: user.type == 'teacher', login_url='home')
+def edit_workshop(request, workshop_id):
+    workshop = get_object_or_404(Workshop, id=workshop_id)
+
+    if request.method == 'POST':
+        form = WorkshopForm(request.POST, instance=workshop)
+        if form.is_valid():
+            form.save()
+            return redirect('my_workshops')
     else:
-        print('NOT DELETE')
-        return ''
+        form = WorkshopForm(instance=workshop)
+
+    context = {'form': form}
+    return render(request, 'edit_workshop.html', context)
+
+
+@login_required
+def edit_user(request):
+    if request.method == 'POST':
+        form = PersonalInfoForm(request.POST, instance=request.user)
+        if form.is_valid():
+            form.save()
+            messages.success(
+                request, 'Personal information updated successfully.')
+            return redirect('home')
+    else:
+        form = PersonalInfoForm(instance=request.user)
+
+    context = {'user': request.user}
+    return render(request, 'user_edit.html', context)

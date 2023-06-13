@@ -1,0 +1,9 @@
+<h1>Edit Workshop</h1>
+
+<form method="POST" action="">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save Changes</button>
+</form>
+{% include 'home_link.html' %}
+{% include 'logout_button.html' %}

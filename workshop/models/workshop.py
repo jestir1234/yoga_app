@@ -6,6 +6,7 @@ from .users import User
 class Workshop(models.Model):
     title = models.CharField(max_length=255)
     date = models.DateField(default=timezone.now)
+    time = models.TimeField()
     teacher = models.ForeignKey(User, on_delete=models.CASCADE)
     price = models.DecimalField(max_digits=10, decimal_places=2)
     description = models.TextField()

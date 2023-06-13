@@ -1,8 +1,15 @@
-{% block content %}
-<h1>Welcome to the Yoga Pilates App!</h1>
 
-<form method="post" action="{% url 'log_out' %}">
-  {% csrf_token %}
-  <button type="submit">Log out</button>
-</form>
+{% block content %}
+<h1>Welcome to Workshop App</h1>
+<p>This is a platform for finding and booking workshops on various topics.</p>
+<ul>
+  <li><a href="{% url 'user_create' %}">Create User</a></li>
+  <li><a href="{% url 'register_view' %}">Register</a></li>
+  <li><a href="{% url 'user-list' %}">List Users</a></li>
+  <li><a href="{% url 'log_out' %}">Log Out</a></li>
+  <li><a href="{% url 'workshop_create_view' %}">Create Workshop</a></li>
+  <li><a href="{% url 'workshops_list' %}">List Workshops</a></li>
+  <li><a href="{% url 'book_workshops' %}">Book Workshops</a></li>
+  <li><a href="{% url 'list_bookings' %}">List Bookings</a></li>
+</ul>
 {% endblock %}

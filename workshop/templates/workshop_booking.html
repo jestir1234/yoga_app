@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Workshops</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    header {
+      background-color: #005DAA;
+      color: #fff;
+      padding: 20px;
+      text-align: center;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 20px;
+    }
+
+    h1 {
+      font-size: 36px;
+      margin-top: 0;
+    }
+
+    h2 {
+      font-size: 24px;
+      margin-top: 0;
+    }
+
+    .workshop {
+      border: 1px solid #ddd;
+      border-radius: 4px;
+      margin-bottom: 20px;
+      padding: 20px;
+    }
+
+    .workshop img {
+      max-width: 50%;
+    }
+
+    .book-button {
+      background-color: #005DAA;
+      border: none;
+      border-radius: 4px;
+      color: #fff;
+      font-size: 16px;
+      padding: 10px 20px;
+    }
+
+    .book-button:disabled {
+      background-color: #ddd;
+      color: #555;
+    }
+  </style>
+</head>
+
+<body>
+  <header>
+    <h1>Workshops</h1>
+  </header>
+  <div class="container">
+    {% for workshop in workshops %}
+    <div class="workshop">
+      <h2>{{ workshop.title }}</h2>
+      <p>Date: {{ workshop.date }}</p>
+      <p>Time: {{ workshop.time }}</p>
+      <p>Price: {{ workshop.price }}</p>
+      <p>Teacher: {{ workshop.teacher }}</p>
+      <p>Location: {{ workshop.location }}</p>
+      <p>Description: {{ workshop.description }}</p>
+      <p><img src="{{ workshop.photo.url }}" alt="{{ workshop.title }}"></p>
+      {% if workshop in bookings %}
+      <button type="button" class="book-button" disabled>Already Booked</button>
+      {% else %}
+      <form method="POST" action="{% url 'book_workshop' workshop.id %}">
+        {% csrf_token %}
+        <input type="hidden" name="workshop_id" value="{{ workshop.id }}">
+        <button type="submit" class="book-button">Book Workshop</button>
+      </form>
+      {% endif %}
+    </div>
+    {% empty %}
+    <p>No workshops are available at the moment.</p>
+    {% endfor %}
+  </div>
+    {% include 'home_link.html' %}
+    {% include 'logout_button.html' %}
+
+</body>
+
+</html>

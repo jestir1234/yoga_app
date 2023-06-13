@@ -3,8 +3,10 @@
 <table>
   <thead>
     <tr>
+      <th>ID</th>
       <th>Title</th>
       <th>Date</th>
+      <th>Time</th>
       <th>Price</th>
       <th>Teacher</th>
       <th>Location</th>
@@ -16,8 +18,10 @@
   <tbody>
     {% for workshop in workshops %}
     <tr>
+      <td>{{ workshop.id }}</td>
       <td>{{ workshop.title }}</td>
       <td>{{ workshop.date }}</td>
+      <td>{{ workshop.time }}</td>
       <td>{{ workshop.price }}</td>
       <td>{{ workshop.teacher }}</td>
       <td>{{ workshop.location }}</td>
@@ -34,6 +38,8 @@
   </tbody>
 </table>
 {% endblock %}
+{% include 'home_link.html' %}
+{% include 'logout_button.html' %}
 
 <style>
   table {

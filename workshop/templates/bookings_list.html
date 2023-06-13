@@ -1,0 +1,87 @@
+{% block content %}
+<h1>Bookings</h1>
+
+{% if bookings %}
+<table class="bookings-table">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>User ID</th>
+      <th>User name</th>
+      <th>Title</th>
+      <th>Date</th>
+      <th>Price</th>
+      <th>Teacher</th>
+      <th>Location</th>
+      <th>Description</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for booking in bookings %}
+    <tr>
+      <td>{{booking.id}}</td>
+      <td>{{booking.user.id}}</td>
+      <td>{{booking.user.first_name}} {{booking.user.last_name}}</td>
+      <td>{{ booking.workshop.title }}</td>
+      <td>{{ booking.workshop.date }}</td>
+      <td>{{ booking.workshop.price }}</td>
+      <td>{{ booking.workshop.teacher }}</td>
+      <td>{{ booking.workshop.location }}</td>
+      <td>{{ booking.workshop.description }}</td>
+      <td>
+        <form method="post" action="{% url 'cancel_booking' booking.id %}">
+          {% csrf_token %}
+          <button type="submit" class="cancel-booking-btn">Cancel Booking</button>
+        </form>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% else %}
+<p>You have not made any bookings yet.</p>
+{% endif %}
+{% endblock %}
+
+{% block styles %}
+{% include 'logout_button.html' %}
+{% include 'home_link.html' %}
+
+
+<style>
+  .bookings-table {
+    border-collapse: collapse;
+    width: 100%;
+  }
+
+  .bookings-table th,
+  .bookings-table td {
+    text-align: left;
+    padding: 8px;
+    border-right: 1px solid #ddd;
+  }
+
+  .bookings-table th:last-child,
+  .bookings-table td:last-child {
+    border-right: none;
+  }
+
+  .bookings-table tr:nth-child(even) {
+    background-color: #f2f2f2;
+  }
+
+  .cancel-booking-btn {
+    background-color: #f44336;
+    color: white;
+    border: none;
+    padding: 8px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 14px;
+    cursor: pointer;
+    border-radius: 4px;
+  }
+</style>
+{% endblock %}

@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>Update Personal Information</title>
+  <style>
+    /* Add your custom styles here */
+  </style>
+</head>
+
+<body>
+  <h1>Update Personal Information</h1>
+  <form method="POST" action="{% url 'edit_user' %}">
+    {% csrf_token %}
+    <label for="first_name">First Name:</label>
+    <input type="text" id="first_name" name="first_name" value="{{ user.first_name }}"><br>
+
+    <label for="last_name">Last Name:</label>
+    <input type="text" id="last_name" name="last_name" value="{{ user.last_name }}"><br>
+
+    <label for="email">Email:</label>
+    <input type="email" id="email" name="email" value="{{ user.email }}"><br>
+
+    {% if user.type == 'teacher' %}
+    <label for="studio_name">Studio Name:</label>
+    <input type="text" id="studio_name" name="studio_name" value="{{ user.studio_name }}"><br>
+
+    <label for="studio_location">Studio Location:</label>
+    <input type="text" id="studio_location" name="studio_location" value="{{ user.studio_location }}"><br>
+    {% endif %}
+
+    <button type="submit">Update</button>
+  </form>
+</body>
+
+{% include 'home_link.html' %}
+{% include 'logout_button.html' %}
+
+</html>

@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <meta charset="UTF-8">
+  <title>My Workshops</title>
+  <style>
+    /* Add your custom styles here */
+  </style>
+</head>
+
+<body>
+  <h1>My Workshops</h1>
+  {% if workshops %}
+  <ul>
+    {% for workshop in workshops %}
+    <li><a href="{% url 'edit_workshop' workshop.id %}">{{ workshop.title }}</a></li>
+    {% empty %}
+    <li>No workshops created yet.</li>
+    {% endfor %}
+  </ul>
+  {% else %}
+  <p>No workshops created yet.</p>
+  {% endif %}
+
+{% include 'home_link.html' %}
+{% include 'logout_button.html' %}
+
+</body>
+
+</html>

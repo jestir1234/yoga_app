@@ -1,0 +1,31 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Virtual environment
+venv/
+env/
+env*/
+ENV/
+env.bak/
+venv.bak/
+
+# SQLite database
+*.sqlite3
+*.db
+
+# Media files
+media/
+
+# Static files
+staticfiles/
+
+# Log files
+*.log
+
+# Local development settings
+settings/local.py
+
+# Ignore pipenv virtual environment
+Pipfile.lock

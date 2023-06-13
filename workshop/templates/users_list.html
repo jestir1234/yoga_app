@@ -3,6 +3,8 @@
 <table>
   <thead>
     <tr>
+      <th>ID</th>
+      <th>Name</th>
       <th>Email</th>
       <th>Type</th>
       <th>Studio Name</th>
@@ -12,6 +14,8 @@
   <tbody>
     {% for user in users %}
     <tr>
+      <td>{{user.id}}</td>
+      <td>{{user.first_name}} {{user.last_name}}</td>
       <td>{{ user.email }}</td>
       <td>{{ user.type }}</td>
       {% if user.type == 'teacher' %}
@@ -26,6 +30,9 @@
   </tbody>
 </table>
 {% endblock %}
+{% include 'home_link.html' %}
+{% include 'logout_button.html' %}
+
 
 <style>
   table {
