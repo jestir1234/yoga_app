@@ -3,25 +3,47 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.shortcuts import render
 from rest_framework.response import Response
-from rest_framework import generics, status
+from rest_framework import generics, status, serializers
 from django.views import View
 from django.http import JsonResponse, HttpResponse
 from .models import Workshop, Booking, User
 from django.contrib import messages
-
 from .serializers import UserSerializer
 from .forms import WorkshopForm, PersonalInfoForm
+from django.middleware.csrf import get_token
+from django.views.decorators.csrf import csrf_exempt
+from django.core import serializers as django_serializers
+from django.urls import reverse
+
+
+@csrf_exempt
+def csrf_token_view(request):
+    if request.method == 'GET':
+        token = get_token(request)
+        return JsonResponse({'csrfToken': token})
+    else:
+        return JsonResponse({'error': 'Invalid request method'}, status=405)
+
 
 def login_view(request):
     if request.method == 'POST':
         email = request.POST['email']
         password = request.POST['password']
-        user = authenticate(request, username=email, password=password)
+        user = authenticate(request, email=email, password=password)
         if user is not None:
             login(request, user)
-            return redirect('home')
+            print('user', user)
+            userObj = {
+                'email': user.email,
+                'first_name': user.first_name,
+                'last_name': user.last_name,
+                'type': user.type,
+                'studio_name': user.studio_name,
+                'studio_location': user.studio_location
+            }
+            return JsonResponse({'message': 'Login Success', 'user': userObj}, status=200)
         else:
-            message = "Invalid login credentials"
+            return JsonResponse({'error': 'Invalid login credentials'}, status=401)
     else:
         message = ""
     return render(request, 'login.html', {'message': message})
@@ -50,6 +72,24 @@ def users_list_view(request):
 class UserCreateView(generics.CreateAPIView):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
+    def perform_create(self, serializer):
+        user = serializer.save()
+        user_data = UserSerializer(user).data
+        return Response(user_data, status=201)
+    
+    def handle_exception(self, exc):
+        if isinstance(exc, serializers.ValidationError):
+            # If the exception is a validation error
+            # Extract the error messages and return them as a plain text response
+            error_messages = []
+            for field, errors in exc.detail.items():
+                for error in errors:
+                    error_messages.append(str(error))
+            return Response({'error': ' '.join(error_messages)}, status=400)
+
+        # For other exceptions, use the default behavior
+        return super().handle_exception(exc)
 
 class UserList(View):
     def get(self, request):
@@ -120,11 +160,14 @@ def workshop_create_view(request):
         form = WorkshopForm(request.POST, request.FILES)
         if form.is_valid():
             print('FORM IS VALID')
+            form.instance.teacher = request.user
             workshop = form.save(commit=False)
             workshop.teacher = request.user
             workshop.save()
             form.save_m2m()
-            return redirect('workshops_list')
+            # Redirect to workshops_list with template query parameter
+            return redirect(reverse('workshops_list') + '?template=1')
+
         else:
             print('FORM IS INVALID')
 
@@ -136,12 +179,33 @@ def workshop_create_view(request):
 
 
 @login_required
-@user_passes_test(lambda user: user.type == 'teacher', login_url='home')
 def workshop_list_view(request):
-    workshops = Workshop.objects.all()
-    context = {'workshops': workshops}
-    return render(request, 'workshops_list.html', context)
-
+    if request.GET.get('template'):
+        workshops = Workshop.objects.all()
+        context = {'workshops': workshops}
+        return render(request, 'workshops_list.html', context)
+    else:
+        workshops = Workshop.objects.all()
+        workshops_data = []
+        for workshop in workshops:
+            teacher = workshop.teacher
+            # Modify the fields as per your User model
+            teacher_info = {'id': teacher.id,
+                            'first_name': teacher.first_name, 'last_name': teacher.last_name, 'email': teacher.email}
+            workshop_data = {
+                'id': workshop.id,
+                'title': workshop.title,
+                'date': workshop.date,
+                'price': workshop.price,
+                'time': workshop.time,
+                'description': workshop.description,
+                'location': workshop.location,
+                'photo': workshop.photo.url if workshop.photo else None,
+                'payment_link': workshop.payment_link,
+                'teacher': teacher_info
+            }
+            workshops_data.append(workshop_data)
+        return JsonResponse(workshops_data, safe=False)
 
 def workshop_delete(request, workshop_id):
     if request.method == 'POST':

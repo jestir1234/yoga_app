@@ -2,7 +2,7 @@ from django.db import models
 from django.contrib.auth.models import AbstractBaseUser
 from django.contrib.auth.hashers import make_password
 from .managers import CustomUserManager
-
+import bcrypt
 
 class User(AbstractBaseUser):
     first_name = models.CharField(max_length=100)
@@ -26,7 +26,11 @@ class User(AbstractBaseUser):
     def __str__(self):
         return self.email
 
+    def set_password(self, password):
+        hashed_password = bcrypt.hashpw(password.encode('utf-8'), bcrypt.gensalt())
+        self.password = hashed_password.decode('utf-8')
+
     def save(self, *args, **kwargs):
         if not self.id:
-            self.password = make_password(self.password)
+            self.set_password(self.password)
         super().save(*args, **kwargs)

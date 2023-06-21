@@ -17,11 +17,13 @@ from workshop.views import (
     list_bookings,
     my_workshops,
     edit_workshop,
-    edit_user
+    edit_user,
+    csrf_token_view
 )
 from django.contrib.auth import views as auth_views
 
 urlpatterns = [
+    path('csrf-token', csrf_token_view, name='csrf-token'),
     path('users/create', UserCreateView.as_view(), name='user_create'),
     path('users/register', register_view, name='register_view'),
     path('users/', users_list_view, name='user-list'),
